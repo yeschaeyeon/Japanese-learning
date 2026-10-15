@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>일본어 회화 노트</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root{
+  --bg:#f6f1e7; --card:#fffdf8; --ink:#2b2622; --sub:#7a6f64; --line:#e3d9c8;
+  --accent:#b5382c; --accent-soft:#f3dcd7; --ok:#2f6b4f; --bad:#b5382c;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#1d1a17; --card:#27231f; --ink:#efe8dc; --sub:#a39887; --line:#3a342d; --accent:#e0705f; --accent-soft:#3d2622; --ok:#6fbf94; --bad:#e0705f;}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;font-size:16px;
+  padding:env(safe-area-inset-top) 16px calc(88px + env(safe-area-inset-bottom));}
+main{max-width:680px;margin:0 auto;padding-top:20px}
+h1{font-size:22px;font-weight:400;margin:0 0 4px;letter-spacing:.02em}
+h1 span{color:var(--accent)}
+.hint{color:var(--sub);font-size:13px;margin:0 0 16px}
+.jp{font-family:"GenRyuMin2","ChosunNm",serif}
+button,input,textarea,select{font:inherit;color:inherit}
+.row{display:flex;gap:8px}
+input[type=text],textarea,select{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);outline:none}
+input[type=text]:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:none;min-height:48px;max-height:140px}
+.btn{border:0;background:var(--accent);color:#fff;padding:0 18px;border-radius:10px;cursor:pointer;white-space:nowrap;min-height:46px}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn:disabled{opacity:.5}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0}
+.card .big{font-size:30px;line-height:1.3}
+.card .kanji{color:var(--sub);font-size:18px;margin-left:8px}
+.meta{color:var(--sub);font-size:14px}
+.tag{display:inline-block;font-size:12px;color:var(--accent);background:var(--accent-soft);padding:1px 9px;border-radius:99px;margin:2px 4px 2px 0}
+.ex{border-top:1px dashed var(--line);padding:10px 0}
+.ex:first-of-type{margin-top:8px}
+.ex .t{font-size:18px}
+.ex .r{color:var(--sub);font-size:13px}
+.sp{border:1px solid var(--line);background:transparent;border-radius:8px;padding:0 8px;min-height:30px;cursor:pointer;margin-left:6px;font-size:14px}
+.sp:active{background:var(--accent-soft)}
+.save{float:right}
+.sec{margin-top:12px;font-size:13px;color:var(--accent);letter-spacing:.05em}
+.err{color:var(--bad);padding:12px 0}
+.loading{color:var(--sub);padding:14px 0}
+.cands button{display:block;width:100%;text-align:left;margin:6px 0;padding:12px;border:1px solid var(--line);background:var(--card);border-radius:10px;cursor:pointer}
+/* 대화 */
+.bubble{padding:10px 14px;border-radius:14px;margin:10px 0;max-width:92%}
+.bubble.me{background:var(--accent-soft);margin-left:auto}
+.bubble.bot{background:var(--card);border:1px solid var(--line)}
+.bubble .t{font-size:18px}
+.opts{display:flex;gap:8px;margin-bottom:12px}
+.opts select{padding:8px 10px}
+.chatbar{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));background:var(--bg);padding:10px 16px;border-top:1px solid var(--line)}
+.chatbar .row{max-width:680px;margin:0 auto;align-items:flex-end}
+/* 가타카나 */
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.grid button{aspect-ratio:1;border:1px solid var(--line);background:var(--card);border-radius:10px;font-size:26px;cursor:pointer;font-family:"GenRyuMin2",serif;position:relative}
+.grid button small{position:absolute;bottom:3px;left:0;right:0;font-size:11px;color:var(--sub);font-family:"ChosunNm",serif}
+.quizq{font-size:64px;text-align:center;margin:10px 0}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choices button{padding:14px;border:1px solid var(--line);background:var(--card);border-radius:10px;font-size:18px;cursor:pointer}
+.choices button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.choices button.no{background:var(--bad);color:#fff;border-color:var(--bad)}
+/* 하단 탭 */
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;border:0;background:transparent;padding:10px 0 8px;font-size:12px;color:var(--sub);cursor:pointer}
+nav button b{display:block;font-size:20px;font-weight:400}
+nav button.on{color:var(--accent)}
+.tab{display:none}.tab.on{display:block}
+ruby rt{font-size:.5em}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 14px;cursor:pointer;font-size:14px}
+.chips button:active,.chips button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.phrase{border-top:1px dashed var(--line);padding:10px 0}
+.phrase:first-of-type{border-top:0}
+.phrase .note{color:var(--sub);font-size:13px}
+.refresh{float:right}
+</style>
+</head>
+<body>
+<main>
+
+<!-- 검색 -->
+<section id="t-search" class="tab on">
+  <h1>일본어 <span>회화 노트</span></h1>
+  <p class="hint">한글 발음(아리가토), 한자(学校), 문법(~테 이루)을 입력해보세요.</p>
+  <form class="row" id="sform">
+    <input type="text" id="q" placeholder="예: 아리가토 / 각코 / ~나이 데" autocomplete="off">
+    <button class="btn">검색</button>
+  </form>
+  <div id="sres"></div>
+</section>
+
+<!-- 대화 -->
+<section id="t-chat" class="tab">
+  <h1>대화 <span>연습</span></h1>
+  <p class="hint">한국어, 히라가나, 가타카나, 한글 발음을 섞어 말해도 돼요.</p>
+  <div class="opts">
+    <select id="level"><option>초급</option><option>중급</option></select>
+    <select id="style"><option>존댓말</option><option>반말</option></select>
+    <button class="btn ghost" id="reset" type="button">새 대화</button>
+  </div>
+  <div id="chatlog"></div>
+  <div class="chatbar"><div class="row">
+    <textarea id="cin" rows="1" placeholder="나 きのう 도서관 에 行った 근데 닫혀있었어"></textarea>
+    <button class="btn" id="csend">보내기</button>
+  </div></div>
+</section>
+
+<!-- 상황별 회화 -->
+<section id="t-sit" class="tab">
+  <h1>상황별 <span>회화</span></h1>
+  <p class="hint">상황을 고르거나 직접 써보세요. 레벨·말투는 대화 탭 설정을 따라요.</p>
+  <div class="chips" id="chips"></div>
+  <form class="row" id="sitform" style="margin-top:10px">
+    <input type="text" id="sitq" placeholder="직접 입력 (예: 편의점에서 계산, 택시 타기)" autocomplete="off">
+    <button class="btn">만들기</button>
+  </form>
+  <div id="sitres"></div>
+</section>
+
+<!-- 가타카나 -->
+<section id="t-kata" class="tab">
+  <h1>가타카나 <span>단어로 외우기</span></h1>
+  <p class="hint">글자를 누르면 외래어 단어가 나와요.</p>
+  <button class="btn ghost" id="quizbtn" type="button" style="margin-bottom:12px">퀴즈 시작</button>
+  <div id="kbox"></div>
+  <div class="grid" id="kgrid"></div>
+</section>
+
+<!-- 저장 -->
+<section id="t-saved" class="tab">
+  <h1>저장한 <span>카드</span></h1>
+  <p class="hint">이 기기(브라우저)에만 저장돼요.</p>
+  <div id="savedlist"></div>
+</section>
+
+</main>
+
+<nav>
+  <button data-tab="search" class="on"><b>🔍</b>검색</button>
+  <button data-tab="chat"><b>💬</b>대화</button>
+  <button data-tab="sit"><b>🗣</b>상황별</button>
+  <button data-tab="kata"><b>ア</b>가타카나</button>
+  <button data-tab="saved"><b>★</b>저장</button>
+</nav>
+
+<script>
+/* ---------- 공통 ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const circ = i => '①②③④⑤⑥⑦⑧⑨⑩'[i] || (i + 1) + '.';
+
+function lsGet(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
+function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+
+/* 발음 듣기 */
+function speak(text, rate = 0.9){
+  if (!('speechSynthesis' in window) || !text) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP'; u.rate = rate;
+  const v = speechSynthesis.getVoices().find(v => v.lang.replace('_','-') === 'ja-JP');
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+if ('speechSynthesis' in window) speechSynthesis.getVoices();
+const sp = (text, label = '🔊') => `<button class="sp" data-say="${esc(text)}" title="듣기">${label}</button>`;
+const sp2 = text => sp(text) + `<button class="sp" data-say="${esc(text)}" data-rate="0.6" title="천천히">🐢</button>`;
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-say]');
+  if (b) speak(b.dataset.say, parseFloat(b.dataset.rate) || 0.9);
+});
+
+/* API */
+function getCode(){
+  let c = ''; try { c = localStorage.getItem('code') || ''; } catch {}
+  if (!c) { c = prompt('접근 코드를 입력하세요') || ''; try { localStorage.setItem('code', c); } catch {} }
+  return c;
+}
+async function api(path, body){
+  const r = await fetch(path, { method:'POST', headers:{'content-type':'application/json','x-access-code':getCode()}, body: JSON.stringify(body) });
+  if (r.status === 401) { try { localStorage.removeItem('code'); } catch {} throw new Error('접근 코드가 틀렸어요. 다시 시도해 주세요.'); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || '오류가 났어요. 잠시 뒤 다시 해보세요.');
+  return j;
+}
+
+/* 탭 */
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === 't-' + b.dataset.tab));
+  if (b.dataset.tab === 'saved') renderSaved();
+  window.scrollTo(0, 0);
+});
+
+/* ---------- 카드 렌더 ---------- */
+const exHtml = list => (list || []).map(e => `
+  <div class="ex"><span class="t jp" lang="ja">${esc(e.text)}</span>${sp2(e.text)}
+  <div class="r jp">${esc(e.reading)}</div><div>${esc(e.meaning_ko)}</div></div>`).join('');
+
+const cardId = c => c.type + ':' + (c.japanese || c.word || c.pattern || c.title || c.input || '');
+
+const phraseHtml = p => `<div class="phrase"><span class="t jp" style="font-size:18px" lang="ja">${esc(p.text)}</span>${sp2(p.text)}
+  <div class="meta jp">${esc(p.reading)}</div><div class="meta">${esc(p.pronunciation_ko)}</div>
+  <div>${esc(p.meaning_ko)}</div>${p.note ? `<div class="note">${esc(p.note)}</div>` : ''}</div>`;
+
+function saveBtn(c){
+  const saved = lsGet('saved', {});
+  const on = !!saved[cardId(c)];
+  return `<button class="sp save" data-save="${esc(cardId(c))}">${on ? '★ 저장됨' : '☆ 저장'}</button>`;
+}
+
+function cardHtml(c){
+  if (c.type === 'word') return `<div class="card">${saveBtn(c)}
+    <div><span class="big jp" lang="ja">${esc(c.japanese)}</span>${c.kanji ? `<span class="kanji jp" lang="ja">${esc(c.kanji)}</span>` : ''}${sp2(c.reading || c.japanese)}</div>
+    <div class="meta jp">${esc(c.reading)} · ${esc(c.pronunciation_ko)}</div>
+    <div style="font-size:18px;margin:4px 0">${esc(c.meaning_ko)}</div>
+    <div>${(c.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+    <div class="sec">예문</div>${exHtml(c.examples)}</div>`;
+  if (c.type === 'kanji_word') return `<div class="card">${saveBtn(c)}
+    <div><span class="big jp" lang="ja">${esc(c.word)}</span>${sp2(c.reading || c.word)}</div>
+    <div class="meta jp">${esc(c.reading)} · ${esc(c.pronunciation_ko)}</div>
+    <div style="font-size:18px;margin:4px 0">${esc(c.meaning_ko)}</div>
+    <div><span class="tag">${esc(c.reading_type)}</span>${c.korean_hanja ? `<span class="tag">한국 한자어: ${esc(c.korean_hanja)}</span>` : ''}</div>
+    <div class="sec">예문</div>${exHtml(c.examples)}</div>`;
+  if (c.type === 'grammar') return `<div class="card">${saveBtn(c)}
+    <div class="big jp" lang="ja">${esc(c.pattern)}</div>
+    <div style="font-size:18px;margin:4px 0">${esc(c.meaning_ko)}</div>
+    <div class="meta">접속: <span class="jp">${esc(c.connection)}</span></div>
+    <p>${esc(c.explanation)}</p>
+    <div class="sec">예문</div>${exHtml(c.examples)}</div>`;
+  if (c.type === 'situation') return `<div class="card">${saveBtn(c)}
+    <div class="big" style="font-size:22px">${esc(c.title)}</div>
+    <div class="sec">내가 하는 말</div>${(c.mine || []).map(phraseHtml).join('')}
+    <div class="sec">상대가 하는 말</div>${(c.theirs || []).map(phraseHtml).join('')}</div>`;
+  if (c.type === 'candidates') return `<div class="card"><div class="meta">“${esc(c.input)}” — 어느 쪽인가요?</div><div class="cands">
+    ${(c.candidates || []).map(x => `<button data-search="${esc(x.japanese)}"><span class="jp">${esc(x.japanese)}</span> (${esc(x.reading)}) — ${esc(x.meaning_ko)}</button>`).join('')}</div></div>`;
+  return `<div class="err">알 수 없는 결과예요.</div>`;
+}
+
+/* 현재 화면에 떠 있는 카드를 id로 찾아 저장 */
+const shown = {};
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-save]');
+  if (b) {
+    const id = b.dataset.save, saved = lsGet('saved', {});
+    if (saved[id]) delete saved[id]; else if (shown[id]) saved[id] = shown[id];
+    lsSet('saved', saved);
+    b.textContent = saved[id] ? '★ 저장됨' : '☆ 저장';
+    if (document.getElementById('t-saved').classList.contains('on')) renderSaved();
+  }
+  const s = e.target.closest('[data-search]');
+  if (s) { $('#q').value = s.dataset.search; $('#sform').requestSubmit(); }
+});
+
+/* ---------- 검색 ---------- */
+$('#sform').onsubmit = async e => {
+  e.preventDefault();
+  const q = $('#q').value.trim(); if (!q) return;
+  const box = $('#sres');
+  box.innerHTML = '<div class="loading">찾는 중…</div>';
+  try {
+    const c = await api('/api/search', { query: q });
+    shown[cardId(c)] = c;
+    box.innerHTML = cardHtml(c);
+  } catch (err) { box.innerHTML = `<div class="err">${esc(err.message)}</div>`; }
+};
+
+/* ---------- 저장 목록 ---------- */
+function renderSaved(){
+  const saved = lsGet('saved', {});
+  const ids = Object.keys(saved);
+  Object.assign(shown, saved);
+  $('#savedlist').innerHTML = ids.length ? ids.map(id => cardHtml(saved[id])).join('') : '<div class="meta">아직 저장한 카드가 없어요.</div>';
+}
+
+/* ---------- 대화 ---------- */
+let history = lsGet('history', []);      // [{u, a:{corrected, reply}}]
+function chatBubbleMe(t){ return `<div class="bubble me">${esc(t)}</div>`; }
+function chatBubbleBot(r){
+  const list = (arr, fn) => (arr || []).map((x, i) => `<div>${circ(i)} ${fn(x)}</div>`).join('');
+  return `<div class="bubble bot">
+    <div class="sec">교정</div>
+    <div><span class="t jp" lang="ja">${esc(r.corrected.text)}</span>${sp2(r.corrected.text)}</div>
+    <div class="meta jp">${esc(r.corrected.reading)}</div>
+    <div class="meta">${esc(r.corrected.pronunciation_ko)}</div>
+    <div>${esc(r.corrected.meaning_ko)}</div>
+    ${(r.corrections || []).length ? `<div class="sec">고친 부분</div>${list(r.corrections, x => `<b class="jp">${esc(x.from)}</b> → <b class="jp">${esc(x.to)}</b> <span class="meta">${esc(x.note)}</span>`)}` : ''}
+    ${(r.vocab || []).length ? `<div class="sec">단어</div>${list(r.vocab, x => `<span class="jp">${esc(x.word)}</span>${sp(x.reading || x.word)} <span class="meta jp">${esc(x.reading)}</span> ${esc(x.meaning_ko)}`)}` : ''}
+    ${(r.grammar || []).length ? `<div class="sec">문법</div>${list(r.grammar, x => `<b class="jp">${esc(x.pattern)}</b> ${esc(x.meaning_ko)} <span class="meta">${esc(x.note)}</span>`)}` : ''}
+  </div>
+  <div class="bubble bot">
+    <div><span class="t jp" lang="ja">${esc(r.reply.text)}</span>${sp2(r.reply.text)}</div>
+    <div class="meta jp">${esc(r.reply.reading)}</div>
+    <div class="meta">${esc(r.reply.pronunciation_ko)}</div>
+    <div>${esc(r.reply.meaning_ko)}</div>
+  </div>`;
+}
+function drawHistory(){
+  $('#chatlog').innerHTML = history.length ? history.map(h => chatBubbleMe(h.u) + (h.full ? chatBubbleBot(h.full) : '')).join('')
+    : '<div class="meta">아래에 아무 말이나 써보세요.</div>';
+}
+drawHistory();
+
+$('#level').value = lsGet('level', '초급'); $('#style').value = lsGet('style', '존댓말');
+$('#level').onchange = e => lsSet('level', e.target.value);
+$('#style').onchange = e => lsSet('style', e.target.value);
+$('#reset').onclick = () => { history = []; lsSet('history', history); drawHistory(); };
+
+const cin = $('#cin');
+cin.addEventListener('input', () => { cin.style.height = 'auto'; cin.style.height = Math.min(cin.scrollHeight, 140) + 'px'; });
+
+async function sendChat(){
+  const text = cin.value.trim(); if (!text) return;
+  cin.value = ''; cin.style.height = 'auto';
+  $('#csend').disabled = true;
+  const log = $('#chatlog');
+  log.insertAdjacentHTML('beforeend', chatBubbleMe(text) + '<div class="loading" id="ld">생각 중…</div>');
+  window.scrollTo(0, document.body.scrollHeight);
+  try {
+    const r = await api('/api/chat', {
+      text, level: $('#level').value, style: $('#style').value,
+      history: history.map(h => ({ u: h.u, a: h.a })),
+    });
+    history.push({ u: text, a: { corrected: r.corrected, reply: r.reply }, full: r });
+    history = history.slice(-30);
+    lsSet('history', history);
+    drawHistory();
+  } catch (err) {
+    $('#ld')?.remove();
+    log.insertAdjacentHTML('beforeend', `<div class="err">${esc(err.message)}</div>`);
+  }
+  $('#csend').disabled = false;
+  window.scrollTo(0, document.body.scrollHeight);
+}
+$('#csend').onclick = sendChat;
+
+/* ---------- 상황별 회화 ---------- */
+const SITUATIONS = ['인사·자기소개','식당에서 주문','카페','길 묻기','쇼핑·옷가게','편의점','지하철·전철','택시','호텔 체크인','공항·입국','병원·약국','친구와 약속','맛집 웨이팅','사진 부탁하기'];
+$('#chips').innerHTML = SITUATIONS.map(s => `<button type="button" data-sit="${esc(s)}">${esc(s)}</button>`).join('');
+$('#chips').onclick = e => { const b = e.target.closest('[data-sit]'); if (b) loadSituation(b.dataset.sit); };
+$('#sitform').onsubmit = e => { e.preventDefault(); const v = $('#sitq').value.trim(); if (v) loadSituation(v); };
+
+async function loadSituation(name, force = false){
+  const level = $('#level').value, style = $('#style').value;
+  const key = [name, level, style].join('|');
+  const cache = lsGet('sitcache', {});
+  document.querySelectorAll('#chips button').forEach(b => b.classList.toggle('on', b.dataset.sit === name));
+  const box = $('#sitres');
+  let c = !force && cache[key];
+  if (!c) {
+    box.innerHTML = '<div class="loading">회화 표현 만드는 중…</div>';
+    try {
+      c = await api('/api/situation', { situation: name, level, style });
+      cache[key] = c;
+      const keys = Object.keys(cache); if (keys.length > 40) delete cache[keys[0]];
+      lsSet('sitcache', cache);
+    } catch (err) { box.innerHTML = `<div class="err">${esc(err.message)}</div>`; return; }
+  }
+  shown[cardId(c)] = c;
+  box.innerHTML = cardHtml(c) + `<button class="btn ghost" id="sitre" type="button">같은 상황 다시 만들기</button>`;
+  $('#sitre').onclick = () => loadSituation(name, true);
+}
+
+/* ---------- 가타카나 ---------- */
+// [글자, 한글, 단어, 한국어 뜻]
+const KATA = [
+ ['ア','아','アイス','아이스크림'],['イ','이','インク','잉크'],['ウ','우','ウイスキー','위스키'],['エ','에','エレベーター','엘리베이터'],['オ','오','オレンジ','오렌지'],
+ ['カ','카','カメラ','카메라'],['キ','키','キムチ','김치'],['ク','쿠','クッキー','쿠키'],['ケ','케','ケーキ','케이크'],['コ','코','コーヒー','커피'],
+ ['サ','사','サラダ','샐러드'],['シ','시','シャツ','셔츠'],['ス','스','スマホ','스마트폰'],['セ','세','セーター','스웨터'],['ソ','소','ソファ','소파'],
+ ['タ','타','タクシー','택시'],['チ','치','チーズ','치즈'],['ツ','츠','ツアー','투어'],['テ','테','テレビ','텔레비전'],['ト','토','トイレ','화장실'],
+ ['ナ','나','ナイフ','나이프'],['ニ','니','ニュース','뉴스'],['ヌ','누','ヌードル','누들'],['ネ','네','ネクタイ','넥타이'],['ノ','노','ノート','노트'],
+ ['ハ','하','ハンバーガー','햄버거'],['ヒ','히','ヒーター','히터'],['フ','후','フォーク','포크'],['ヘ','헤','ヘルメット','헬멧'],['ホ','호','ホテル','호텔'],
+ ['マ','마','マスク','마스크'],['ミ','미','ミルク','우유'],['ム','무','ムービー','영화'],['メ','메','メニュー','메뉴'],['モ','모','モデル','모델'],
+ ['ヤ','야','ヤクルト','야쿠르트'],['ユ','유','ユニフォーム','유니폼'],['ヨ','요','ヨーグルト','요거트'],
+ ['ラ','라','ラーメン','라면'],['リ','리','リモコン','리모컨'],['ル','루','ルール','규칙'],['レ','레','レストラン','레스토랑'],['ロ','로','ロボット','로봇'],
+ ['ワ','와','ワイン','와인'],['ン','응','パン','빵']
+];
+const kgrid = $('#kgrid'), kbox = $('#kbox');
+kgrid.innerHTML = KATA.map((k, i) => `<button data-k="${i}">${k[0]}<small>${k[1]}</small></button>`).join('');
+kgrid.onclick = e => {
+  const b = e.target.closest('[data-k]'); if (!b) return;
+  const k = KATA[b.dataset.k];
+  speak(k[0]);
+  kbox.innerHTML = `<div class="card"><div><span class="big jp" lang="ja" style="font-size:44px">${k[0]}</span>${sp(k[0])}
+    <span class="meta"> ${k[1]}</span></div>
+    <div class="ex"><span class="t jp" lang="ja">${k[2]}</span>${sp2(k[2])}<div>${k[3]}</div></div></div>`;
+};
+
+/* 퀴즈: 글자를 보고 한글 소리 고르기 (헷갈리는 글자가 보기에 섞여요) */
+const CONFUSE = { 'シ':'츠','ツ':'시','ソ':'응','ン':'소','ノ':'메','メ':'노','ク':'케','ケ':'쿠','ワ':'우','ウ':'와','ヌ':'메','ス':'누' };
+$('#quizbtn').onclick = quiz;
+function quiz(){
+  const k = KATA[Math.floor(Math.random() * KATA.length)];
+  const opts = new Set([k[1]]);
+  if (CONFUSE[k[0]]) opts.add(CONFUSE[k[0]]);
+  while (opts.size < 4) opts.add(KATA[Math.floor(Math.random() * KATA.length)][1]);
+  const arr = [...opts].sort(() => Math.random() - .5);
+  kbox.innerHTML = `<div class="card"><div class="quizq jp" lang="ja">${k[0]}</div>
+    <div class="choices">${arr.map(o => `<button data-a="${o}">${o}</button>`).join('')}</div><div id="qfb"></div></div>`;
+  kbox.querySelector('.choices').onclick = e => {
+    const b = e.target.closest('[data-a]'); if (!b || b.disabled) return;
+    const ok = b.dataset.a === k[1];
+    kbox.querySelectorAll('.choices button').forEach(x => { x.disabled = true; if (x.dataset.a === k[1]) x.classList.add('ok'); });
+    if (!ok) b.classList.add('no');
+    speak(k[2]);
+    $('#qfb').innerHTML = `<div class="ex"><span class="t jp" lang="ja">${k[2]}</span>${sp2(k[2])} <span class="meta">${k[3]}</span>
+      <div><button class="btn" id="nextq" style="margin-top:10px">다음 문제</button></div></div>`;
+    $('#nextq').onclick = quiz;
+  };
+}
+</script>
+</body>
+</html>

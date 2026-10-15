@@ -1,0 +1,14 @@
+@font-face {
+  font-family: "GenRyuMin2";
+  src: url("fonts/GenRyuMin2JP-R.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ChosunNm";
+  src: url("fonts/ChosunNm.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+body { font-family: "ChosunNm", "GenRyuMin2", serif; }
+.jp  { font-family: "GenRyuMin2", "ChosunNm", serif; }
