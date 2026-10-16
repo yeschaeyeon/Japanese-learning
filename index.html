@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ffffff">
+<title>일본어 회화 노트</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root{
+  --bg:#ffffff; --ink:#111111; --sub:#7d828b; --line:#111111; --hair:#d9dbe0; --soft:#f3f4f6;
+  --g:#7fe98d; --y:#fbe24d; --p:#f4a6ef;   /* 형광펜: 초록 / 노랑 / 분홍 */
+  --bw:1.5px;
+}
+*{box-sizing:border-box;border-radius:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;font-size:16px;
+  padding:env(safe-area-inset-top) 18px calc(150px + env(safe-area-inset-bottom));}
+main{max-width:680px;margin:0 auto;padding-top:18px}
+.jp{font-family:"GenRyuMin2","ChosunNm",serif}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+
+/* 헤더 */
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.lab{font-size:11px;letter-spacing:.3em;color:var(--sub)}
+h1{font-size:26px;font-weight:400;margin:4px 0 0;letter-spacing:.02em}
+.hint{color:var(--sub);font-size:13px;margin:8px 0 16px}
+.sync{border:1px solid var(--hair);background:#fff;font-size:11px;color:var(--sub);padding:4px 8px;white-space:nowrap;margin-top:2px}
+.sync.ok{color:var(--ink);border-color:var(--ink)}
+.sync.err{color:#c0392b;border-color:#c0392b}
+
+/* 형광펜 (직사각형) */
+.hl{padding:0 6px;display:inline-block;line-height:1.5}
+.g{background:var(--g)}.y{background:var(--y)}.p{background:var(--p)}
+mark.hl{color:inherit}
+
+/* 입력 / 버튼 */
+.row{display:flex}
+input[type=text],textarea,select{width:100%;padding:11px 13px;border:var(--bw) solid var(--line);background:#fff;outline:none}
+input[type=text]:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink)}
+textarea{resize:none;min-height:46px;max-height:140px}
+.row input[type=text]{border-right:0}
+.btn{border:var(--bw) solid var(--ink);background:var(--ink);color:#fff;padding:0 18px;white-space:nowrap;min-height:46px}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn:disabled{opacity:.45}
+.btn.block{width:100%;margin-top:12px}
+
+/* 카드 */
+.card{border:var(--bw) solid var(--line);background:#fff;padding:16px 16px 6px;margin:14px 0;position:relative}
+.k{font-size:11px;letter-spacing:.28em;color:var(--sub)}
+.big{font-size:40px;line-height:1.2;margin:4px 0 0}
+.kanji{color:var(--sub);font-size:18px;margin-left:8px}
+.meta{color:var(--sub);font-size:14px}
+.mean{font-size:19px;margin:10px 0 8px}
+.tags{margin:6px 0 4px}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;margin:0 6px 6px 0;border:1px solid var(--hair);color:var(--sub)}
+.tag.hl{border-color:transparent;color:var(--ink)}
+.sec{font-size:11px;letter-spacing:.28em;color:var(--sub);margin:14px 0 2px}
+.ex{border-top:1px solid var(--hair);padding:10px 0}
+.ex .t{font-size:19px}
+.ex .r{color:var(--sub);font-size:12.5px}
+.ex .m{font-size:14.5px;margin-top:1px}
+.sp{border:1px solid var(--line);background:#fff;min-width:30px;height:28px;padding:0 6px;margin-left:6px;font-size:13px;vertical-align:middle;line-height:1}
+.sp:active{background:var(--ink);color:#fff}
+.save{float:right;margin:0}
+.save.on{background:var(--ink);color:#fff}
+.err{color:#c0392b;padding:12px 0}
+.loading{color:var(--sub);padding:14px 0}
+.cands button{display:block;width:100%;text-align:left;margin:8px 0;padding:12px;border:var(--bw) solid var(--line);background:#fff}
+
+/* 상황별 칩 */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{border:var(--bw) solid var(--line);background:#fff;padding:7px 12px;font-size:14px}
+.chips button.on{background:var(--ink);color:#fff}
+.phrase{border-top:1px solid var(--hair);padding:10px 0}
+.phrase:first-of-type{border-top:0}
+.phrase .note{color:var(--sub);font-size:13px}
+
+/* 대화 */
+.opts{display:flex;gap:8px;margin-bottom:12px}
+.opts select{padding:9px 10px}
+.bubble{border:var(--bw) solid var(--line);padding:11px 14px;margin:12px 0;max-width:94%;background:#fff}
+.bubble.me{margin-left:auto;background:var(--soft)}
+.bubble .t{font-size:19px;line-height:1.5}
+.line{padding:6px 0;border-top:1px solid var(--hair);font-size:14.5px}
+.line:first-of-type{border-top:0}
+.chatbar{position:fixed;left:0;right:0;bottom:calc(76px + env(safe-area-inset-bottom));background:#fff;padding:10px 18px;border-top:var(--bw) solid var(--line);z-index:5}
+.chatbar .row{max-width:680px;margin:0 auto;align-items:flex-end}
+.chatbar textarea{border-right:0}
+
+/* 가타카나 */
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-left:var(--bw) solid var(--line);border-top:var(--bw) solid var(--line)}
+.grid button{aspect-ratio:1;border:0;border-right:var(--bw) solid var(--line);border-bottom:var(--bw) solid var(--line);background:#fff;font-size:26px;position:relative;font-family:"GenRyuMin2",serif}
+.grid button small{position:absolute;bottom:3px;left:0;right:0;font-size:11px;color:var(--sub);font-family:"ChosunNm",serif}
+.grid button:active{background:var(--ink);color:#fff}
+.quizq{font-size:64px;text-align:center;margin:8px 0 14px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choices button{padding:14px;border:var(--bw) solid var(--line);background:#fff;font-size:18px}
+.choices button.ok{background:var(--g)}
+.choices button.no{background:var(--p)}
+
+/* 하단 메뉴: 선택 = 검정 */
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#fff;border-top:var(--bw) solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:6}
+nav button{flex:1;border:0;background:transparent;color:var(--sub);font-size:11px;padding:0}
+nav button b{display:inline-block;font-weight:400;font-size:21px;font-family:"GenRyuMin2",serif;color:var(--ink);padding:2px 15px;margin-bottom:2px}
+nav button.on{color:var(--ink)}
+nav button.on b{background:var(--ink);color:#fff}
+.tab{display:none}.tab.on{display:block}
+</style>
+</head>
+<body>
+<main>
+
+<!-- 검색 -->
+<section id="t-search" class="tab on">
+  <div class="head"><div><div class="lab">会話ノート</div><h1>일본어 회화 노트</h1></div><button class="sync" data-syncbtn>동기화 꺼짐</button></div>
+  <p class="hint">한글 발음(아리가토), 한자(学校), 문법(~테 이루), 한국어 뜻(화장실)을 입력해보세요. 내 데이터에서 먼저 찾고, 없으면 AI가 알려줘요.</p>
+  <form class="row" id="sform">
+    <input type="text" id="q" placeholder="예: 아리가토 / 각코 / ~나이 데" autocomplete="off">
+    <button class="btn">探す</button>
+  </form>
+  <div id="sres"></div>
+</section>
+
+<!-- 대화 -->
+<section id="t-chat" class="tab">
+  <div class="head"><div><div class="lab">会話</div><h1>대화 연습</h1></div><button class="sync" data-syncbtn>동기화 꺼짐</button></div>
+  <p class="hint">한국어, 히라가나, 가타카나, 한글 발음을 섞어 말해도 돼요.</p>
+  <div class="opts">
+    <select id="level"><option>초급</option><option>중급</option></select>
+    <select id="style"><option>존댓말</option><option>반말</option></select>
+    <button class="btn ghost" id="reset" type="button">새 대화</button>
+  </div>
+  <div id="chatlog"></div>
+  <div class="chatbar"><div class="row">
+    <textarea id="cin" rows="1" placeholder="나 きのう 도서관 에 行った 근데 닫혀있었어"></textarea>
+    <button class="btn" id="csend">送る</button>
+  </div></div>
+</section>
+
+<!-- 상황별 회화 -->
+<section id="t-sit" class="tab">
+  <div class="head"><div><div class="lab">場面</div><h1>상황별 회화</h1></div><button class="sync" data-syncbtn>동기화 꺼짐</button></div>
+  <p class="hint">상황을 고르세요. ✨ 표시와 직접 입력은 AI가 만들어요(레벨·말투는 대화 탭 설정을 따라요).</p>
+  <div class="chips" id="chips"></div>
+  <form class="row" id="sitform" style="margin-top:12px">
+    <input type="text" id="sitq" placeholder="직접 입력 (예: 편의점에서 계산, 택시 타기)" autocomplete="off">
+    <button class="btn">作る</button>
+  </form>
+  <div id="sitres"></div>
+</section>
+
+<!-- 가타카나 -->
+<section id="t-kata" class="tab">
+  <div class="head"><div><div class="lab">片仮名</div><h1>가타카나</h1></div><button class="sync" data-syncbtn>동기화 꺼짐</button></div>
+  <p class="hint">글자를 누르면 외래어 단어가 나와요.</p>
+  <button class="btn ghost" id="quizbtn" type="button" style="margin-bottom:12px">퀴즈 시작</button>
+  <div id="kbox"></div>
+  <div class="grid" id="kgrid"></div>
+</section>
+
+<!-- 저장 -->
+<section id="t-saved" class="tab">
+  <div class="head"><div><div class="lab">栞</div><h1>저장한 카드</h1></div><button class="sync" data-syncbtn>동기화 꺼짐</button></div>
+  <p class="hint">저장한 카드는 같은 접근 코드를 쓰는 기기끼리 동기화돼요.</p>
+  <div id="savedlist"></div>
+</section>
+
+</main>
+
+<nav>
+  <button data-tab="search" class="on"><b>探</b><br>검색</button>
+  <button data-tab="chat"><b>話</b><br>대화</button>
+  <button data-tab="sit"><b>場</b><br>상황</button>
+  <button data-tab="kata"><b>ア</b><br>가타카나</button>
+  <button data-tab="saved"><b>栞</b><br>저장</button>
+</nav>
+
+<script src="kana.js"></script>
+<script src="data-situations.js"></script>
+<script src="data-grammar.js"></script>
+<script src="data-words.js"></script>
+<script>
+/* ================= 공통 ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const circ = i => '①②③④⑤⑥⑦⑧⑨⑩'[i] || (i + 1) + '.';
+function lsGet(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
+function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+function stable(o){ return JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v); }
+
+/* 하이라이트 */
+const hl = (text, color) => `<mark class="hl ${color}">${esc(text)}</mark>`;
+function markIn(text, words, color = 'g'){
+  const t = String(text ?? '');
+  for (const w of (words || []).filter(Boolean)) {
+    const i = t.indexOf(w);
+    if (i >= 0) return esc(t.slice(0, i)) + hl(w, color) + esc(t.slice(i + w.length));
+  }
+  return esc(t);
+}
+
+/* 발음 듣기 */
+function speak(text, rate = 0.9){
+  if (!('speechSynthesis' in window) || !text) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP'; u.rate = rate;
+  const v = speechSynthesis.getVoices().find(v => v.lang.replace('_','-') === 'ja-JP');
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+if ('speechSynthesis' in window) speechSynthesis.getVoices();
+const sp = (text, label = '🔊') => `<button class="sp" data-say="${esc(text)}" title="듣기">${label}</button>`;
+const sp2 = text => sp(text) + `<button class="sp" data-say="${esc(text)}" data-rate="0.6" title="천천히">🐢</button>`;
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-say]');
+  if (b) speak(b.dataset.say, parseFloat(b.dataset.rate) || 0.9);
+});
+
+/* 접근 코드 + API */
+function readCode(){ try { return localStorage.getItem('code') || ''; } catch { return ''; } }
+function getCode(){ return readCode(); }
+function forgetCode(){ try { localStorage.removeItem('code'); } catch {} }
+async function api(path, body){
+  const r = await fetch(path, { method:'POST', headers:{'content-type':'application/json','x-access-code':getCode()}, body: JSON.stringify(body) });
+  if (r.status === 401) { forgetCode(); const c = (prompt('접근 코드를 입력하세요') || '').trim(); if (c) { try { localStorage.setItem('code', c); } catch {} } throw new Error('접근 코드가 필요해요. 방금 입력했다면 다시 시도해 주세요.'); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || '오류가 났어요. 잠시 뒤 다시 해보세요.');
+  return j;
+}
+
+/* 탭 */
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === 't-' + b.dataset.tab));
+  if (b.dataset.tab === 'saved') renderSaved();
+  if (b.dataset.tab === 'chat') window.scrollTo(0, document.body.scrollHeight);
+  else window.scrollTo(0, 0);
+});
+
+/* ================= 저장소 (기기 안) + 동기화 ================= */
+// store = { saved:{id:{c:카드, ts, d}}, hist:[{t,u,a,full}], resetAt, prefs:{level,style,ts} }
+function loadStore(){
+  let s = lsGet('jpnote2', null);
+  if (!s) {   // 예전 버전 데이터 옮기기
+    s = { saved:{}, hist:[], resetAt:0, prefs:{ level: lsGet('level','초급'), style: lsGet('style','존댓말'), ts:0 } };
+    const old = lsGet('saved', {});
+    Object.keys(old).forEach(id => s.saved[id] = { c: old[id], ts: 1, d: 0 });
+    lsGet('history', []).forEach((h, i) => s.hist.push({ t: i + 1, u: h.u, a: h.a, full: h.full }));
+  }
+  s.saved = s.saved || {}; s.hist = s.hist || []; s.resetAt = s.resetAt || 0; s.prefs = s.prefs || { level:'초급', style:'존댓말', ts:0 };
+  return s;
+}
+let store = loadStore();
+const syncData = s => ({ saved:s.saved, hist:s.hist, resetAt:s.resetAt, prefs:s.prefs });
+function persist(){ lsSet('jpnote2', syncData(store)); scheduleSync(); }
+
+function mergeStores(a, b){
+  const out = { saved:{}, hist:[], resetAt:0, prefs:{ level:'초급', style:'존댓말', ts:0 } };
+  const ids = new Set([...Object.keys(a.saved || {}), ...Object.keys(b.saved || {})]);
+  ids.forEach(id => {
+    const x = a.saved?.[id], y = b.saved?.[id];
+    out.saved[id] = !x ? y : !y ? x : (y.ts > x.ts ? y : x);
+  });
+  out.resetAt = Math.max(a.resetAt || 0, b.resetAt || 0);
+  const m = new Map();
+  [...(a.hist || []), ...(b.hist || [])].forEach(h => { if (h && h.t > out.resetAt) m.set(h.t, h); });
+  out.hist = [...m.values()].sort((x, y) => x.t - y.t).slice(-30);
+  const pa = a.prefs || { ts:0 }, pb = b.prefs || { ts:0 };
+  out.prefs = (pb.ts || 0) > (pa.ts || 0) ? pb : pa;
+  return out;
+}
+
+/* 동기화 상태 표시 */
+function setSync(text, cls){
+  document.querySelectorAll('[data-syncbtn]').forEach(b => { b.textContent = text; b.className = 'sync ' + (cls || ''); });
+}
+let syncTimer = null, syncing = false;
+function scheduleSync(){ clearTimeout(syncTimer); syncTimer = setTimeout(() => syncNow(), 1200); }
+
+async function syncCall(body){
+  const r = await fetch('/api/sync', { method:'POST', headers:{'content-type':'application/json','x-access-code':readCode()}, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  return { status: r.status, j };
+}
+async function syncNow(manual = false){
+  if (syncing) return;
+  syncing = true; setSync('동기화 중…');
+  try {
+    const got = await syncCall({ action:'get' });
+    if (got.status === 401) { forgetCode(); setSync('코드 필요', 'err'); if (manual) { const c = (prompt('접근 코드를 입력하세요') || '').trim(); if (c) { try { localStorage.setItem('code', c); } catch {} syncing = false; return syncNow(); } } return; }
+    if (got.status === 501) { setSync('저장소 미연결', 'err'); return; }
+    if (got.status === 404) { setSync('sync.js 없음', 'err'); return; }
+    if (got.status !== 200) throw new Error('get ' + got.status);
+    const remote = got.j.data || { saved:{}, hist:[], resetAt:0, prefs:null };
+    const merged = mergeStores(syncData(store), remote);
+    const changedLocal = stable(merged) !== stable(syncData(store));
+    if (changedLocal) { store = { ...store, ...merged }; lsSet('jpnote2', syncData(store)); applyAfterSync(); }
+    if (stable(merged) !== stable(remote)) {
+      const put = await syncCall({ action:'put', data: merged });
+      if (put.status !== 200) throw new Error('put ' + put.status);
+    }
+    const d = new Date();
+    setSync('동기화됨 ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'), 'ok');
+  } catch (e) {
+    const m = String(e && e.message || '');
+    setSync(m.includes('404') ? 'sync.js 없음' : /^(get|put) \d+/.test(m) ? '서버 오류 ' + m : navigator.onLine ? '연결 실패' : '오프라인', 'err');
+  } finally { syncing = false; }
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-syncbtn]')) syncNow(true); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncNow(); });
+window.addEventListener('online', () => syncNow());
+
+/* 동기화로 데이터가 바뀌면 화면 다시 그리기 */
+function applyAfterSync(){
+  $('#level').value = store.prefs.level; $('#style').value = store.prefs.style;
+  drawHistory();
+  if ($('#t-saved').classList.contains('on')) renderSaved();
+  refreshSaveButtons();
+}
+
+/* ================= 카드 렌더 ================= */
+const exHtml = (list, words) => (list || []).map(e => `
+  <div class="ex"><span class="t jp" lang="ja">${markIn(e.text, words)}</span>${sp2(e.text)}
+  <div class="r jp">${esc(cleanReading(e.reading))}</div>
+  <div class="r">${esc(e.pronunciation_ko || kanaToHangul(e.reading))}</div>
+  <div class="m">${esc(e.meaning_ko)}</div></div>`).join('');
+
+const cardId = c => c.type + ':' + (c.japanese || c.word || c.pattern || c.title || c.input || '');
+const phraseHtml = p => `<div class="phrase"><span class="t jp" style="font-size:19px" lang="ja">${esc(p.text)}</span>${sp2(p.text)}
+  <div class="meta jp" style="font-size:12.5px">${esc(cleanReading(p.reading))}</div><div class="meta" style="font-size:12.5px">${esc(p.pronunciation_ko || kanaToHangul(p.reading))}</div>
+  <div>${esc(p.meaning_ko)}</div>${p.note ? `<div class="note">${esc(p.note)}</div>` : ''}</div>`;
+
+function isSaved(id){ const s = store.saved[id]; return !!(s && !s.d); }
+function saveBtn(c){
+  const id = cardId(c), on = isSaved(id);
+  return `<button class="sp save ${on ? 'on' : ''}" data-save="${esc(id)}">${on ? '栞 저장됨' : '栞 저장'}</button>`;
+}
+function refreshSaveButtons(){
+  document.querySelectorAll('[data-save]').forEach(b => {
+    const on = isSaved(b.dataset.save);
+    b.textContent = on ? '栞 저장됨' : '栞 저장'; b.classList.toggle('on', on);
+  });
+}
+
+function cardHtml(c){
+  if (c.type === 'word') return `<div class="card">${saveBtn(c)}
+    <div class="k">単語${c.tags && c.tags[0] ? ' · ' + esc(c.tags[0]) : ''}</div>
+    <div class="big jp" lang="ja">${esc(c.japanese)}${c.kanji ? `<span class="kanji">${esc(c.kanji)}</span>` : ''}${sp2(c.reading || c.japanese)}</div>
+    <div class="meta jp">${esc(c.reading)} · ${esc(c.pronunciation_ko)}</div>
+    <div class="mean">${hl(c.meaning_ko, 'g')}</div>
+    <div class="tags">${(c.tags || []).map((t, i) => `<span class="tag ${i === 0 ? 'hl y' : ''}">${esc(t)}</span>`).join('')}</div>
+    <div class="sec">例文</div>${exHtml(c.examples, [c.kanji, c.japanese])}</div>`;
+  if (c.type === 'kanji_word') return `<div class="card">${saveBtn(c)}
+    <div class="k">漢字 · ${c.tags && c.tags[0] ? esc(c.tags[0]) : '単語'}</div>
+    <div class="big jp" lang="ja">${esc(c.word)}${sp2(c.reading || c.word)}</div>
+    <div class="meta jp">${esc(c.reading)} · ${esc(c.pronunciation_ko)}</div>
+    <div class="mean">${hl(c.meaning_ko, 'g')}</div>
+    <div class="tags">${c.reading_type ? `<span class="tag hl y">${esc(c.reading_type)}</span>` : ''}${c.korean_hanja ? `<span class="tag hl p">한국 한자어 · ${esc(c.korean_hanja)}</span>` : ''}</div>
+    <div class="sec">例文</div>${exHtml(c.examples, [c.word])}</div>`;
+  if (c.type === 'grammar') return `<div class="card">${saveBtn(c)}
+    <div class="k">文法</div>
+    <div class="big jp" lang="ja" style="font-size:32px">${hl(c.pattern, 'p')}</div>
+    ${c.reading ? `<div class="meta jp">${esc(c.reading)} · ${esc(c.pronunciation_ko)}</div>` : ''}
+    <div class="mean">${hl(c.meaning_ko, 'g')}</div>
+    <div class="meta">접속 · <span class="jp">${esc(c.connection)}</span></div>
+    <p style="margin:8px 0 4px">${esc(c.explanation)}</p>
+    <div class="sec">例文</div>${exHtml(c.examples)}</div>`;
+  if (c.type === 'situation') return `<div class="card">${saveBtn(c)}
+    <div class="k">場面</div>
+    <div class="big" style="font-size:24px">${esc(c.title)}</div>
+    <div class="sec">내가 하는 말</div>${(c.mine || []).map(phraseHtml).join('')}
+    <div class="sec">상대가 하는 말</div>${(c.theirs || []).map(phraseHtml).join('')}</div>`;
+  if (c.type === 'candidates') return `<div class="card"><div class="meta">“${esc(c.input)}” — 어느 쪽인가요?</div><div class="cands">
+    ${(c.candidates || []).map(x => `<button data-search="${esc(x.japanese)}"><span class="jp">${esc(x.japanese)}</span> (${esc(x.reading)}) — ${esc(x.meaning_ko)}</button>`).join('')}</div></div>`;
+  return `<div class="err">알 수 없는 결과예요.</div>`;
+}
+
+/* 현재 화면에 떠 있는 카드를 id로 찾아 저장 */
+const shown = {};
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-save]');
+  if (b) {
+    const id = b.dataset.save, cur = store.saved[id];
+    const card = shown[id] || cur?.c;
+    if (cur && !cur.d) store.saved[id] = { c: cur.c, ts: Date.now(), d: 1 };
+    else if (card) store.saved[id] = { c: card, ts: Date.now(), d: 0 };
+    persist(); refreshSaveButtons();
+    if ($('#t-saved').classList.contains('on')) renderSaved();
+  }
+  const s = e.target.closest('[data-search]');
+  if (s) { $('#q').value = s.dataset.search; $('#sform').requestSubmit(); }
+});
+
+/* ================= 고정 데이터 → 카드 ================= */
+const TYPE_KO = { on:'음독', kun:'훈독', mix:'혼합' };
+const KANJI_RE = /[一-鿿]/;
+const mkEx = a => ({ text:a[0], reading:cleanReading(a[1]), pronunciation_ko:kanaToHangul(a[1]), meaning_ko:a[2], note:a[3] || '' });
+function buildWord(w){
+  const [disp, rd, ko, tag, ext, exr, exk, hanja, rt] = w;
+  const base = { reading:cleanReading(rd), pronunciation_ko:kanaToHangul(rd), meaning_ko:ko, examples:[mkEx([ext, exr, exk])], tags:[tag] };
+  return KANJI_RE.test(disp)
+    ? { type:'kanji_word', word:disp, korean_hanja:hanja || '', reading_type:TYPE_KO[rt] || '', ...base }
+    : { type:'word', input:'', japanese:disp, kanji:'', ...base };
+}
+function buildGrammar(g){
+  return { type:'grammar', pattern:g.p, reading:g.r, pronunciation_ko:kanaToHangul(g.r), meaning_ko:g.ko, connection:g.conn, explanation:g.exp, examples:g.ex.map(mkEx) };
+}
+function buildSituation(s){
+  return { type:'situation', title:s.title, mine:s.mine.map(mkEx), theirs:s.theirs.map(mkEx), _local:true };
+}
+
+/* ================= 검색 ================= */
+const LOCAL = [];
+const nk = normKey;
+function addLocal(card, kind, keys, ko){
+  LOCAL.push({ card, kind, ko: (ko || []).map(nk).filter(Boolean), keys: keys.filter(Boolean).map(k => nk(k)).filter(Boolean) });
+}
+WORDS_DATA.forEach(w => {
+  const c = buildWord(w);
+  addLocal(c, 'word', [w[0], w[1], c.pronunciation_ko, w[7]], w[2].split(/[\/,]/).map(s => s.trim()));
+});
+GRAMMAR_DATA.forEach(g => {
+  const c = buildGrammar(g);
+  addLocal(c, 'grammar', [g.p, g.r, c.pronunciation_ko], g.ko.split(/[\/,(]/).map(s => s.replace(/[~)]/g, '').trim()));
+});
+SITUATIONS_DATA.forEach(s => {
+  const sc = buildSituation(s);
+  [...sc.mine, ...sc.theirs].forEach(p => {
+    addLocal({ type:'phrase', ...p, title:s.title }, 'phrase', [p.text, p.reading, p.pronunciation_ko], [p.meaning_ko]);
+  });
+});
+
+function localSearch(query){
+  const q = nk(query);
+  if (!q) return [];
+  const out = [];
+  for (const it of LOCAL) {
+    let best = 0;
+    for (const k of it.keys) {
+      if (k === q) best = Math.max(best, 100);
+      else if (k.startsWith(q)) best = Math.max(best, 60);
+      else if (q.length >= 2 && k.includes(q)) best = Math.max(best, 35);
+    }
+    for (const n of it.ko) {
+      if (n === q) best = Math.max(best, 90);
+      else if (q.length >= 2 && n.includes(q)) best = Math.max(best, 30);
+    }
+    if (best) out.push({ it, score: best + (it.kind === 'phrase' ? -5 : 0) });
+  }
+  out.sort((a, b) => b.score - a.score);
+  return out.slice(0, 8).map(x => x.it);
+}
+const phraseCard = c => `<div class="card"><div class="k">場面 · ${esc(c.title)}</div>${phraseHtml(c)}</div>`;
+
+async function runAI(q, box){
+  box.innerHTML = '<div class="loading">AI에게 물어보는 중…</div>';
+  try {
+    const c = await api('/api/search', { query: q });
+    shown[cardId(c)] = c;
+    box.innerHTML = cardHtml(c);
+  } catch (err) { box.innerHTML = `<div class="err">${esc(err.message)}</div>`; }
+}
+$('#sform').onsubmit = async e => {
+  e.preventDefault();
+  const q = $('#q').value.trim(); if (!q) return;
+  const box = $('#sres');
+  const hits = localSearch(q);
+  if (hits.length) {
+    hits.forEach(h => { if (h.card.type !== 'phrase') shown[cardId(h.card)] = h.card; });
+    box.innerHTML = hits.map(h => h.card.type === 'phrase' ? phraseCard(h.card) : cardHtml(h.card)).join('')
+      + `<button class="btn ghost block" id="aimore" type="button">AIに聞く — 원하는 게 없으면 AI에게 물어보기</button>`;
+    $('#aimore').onclick = () => { box.innerHTML = ''; runAI(q, box); };
+  } else runAI(q, box);
+};
+
+/* ================= 저장 목록 ================= */
+function renderSaved(){
+  const items = Object.keys(store.saved).filter(id => !store.saved[id].d).sort((a, b) => store.saved[b].ts - store.saved[a].ts);
+  items.forEach(id => shown[id] = store.saved[id].c);
+  $('#savedlist').innerHTML = items.length ? items.map(id => cardHtml(store.saved[id].c)).join('') : '<div class="meta">아직 저장한 카드가 없어요.</div>';
+}
+
+/* ================= 대화 ================= */
+function chatMe(h){
+  const fixes = (h.full?.corrections || []).map(x => x.from).filter(Boolean);
+  let html = esc(h.u);
+  fixes.forEach(f => { const e = esc(f); if (html.includes(e)) html = html.replace(e, `<mark class="hl p">${e}</mark>`); });
+  return `<div class="bubble me">${html}</div>`;
+}
+function chatBot(r){
+  const list = (arr, fn) => (arr || []).map((x, i) => `<div class="line">${circ(i)} ${fn(x)}</div>`).join('');
+  const toWords = (r.corrections || []).map(x => x.to).filter(Boolean);
+  return `<div class="bubble">
+    <div class="k">校正</div>
+    <div><span class="t jp" lang="ja">${markIn(r.corrected.text, toWords)}</span>${sp2(r.corrected.text)}</div>
+    <div class="meta jp" style="font-size:12.5px">${esc(cleanReading(r.corrected.reading))}</div>
+    <div class="meta" style="font-size:12.5px">${esc(r.corrected.pronunciation_ko)}</div>
+    <div>${esc(r.corrected.meaning_ko)}</div>
+    ${(r.corrections || []).length ? `<div class="sec">고친 부분</div>${list(r.corrections, x => `${hl(x.from, 'p')} → ${hl(x.to, 'g')} <span class="meta">${esc(x.note)}</span>`)}` : ''}
+    ${(r.vocab || []).length ? `<div class="sec">단어</div>${list(r.vocab, x => `${hl(x.word, 'y')}${sp(x.reading || x.word)} <span class="meta jp">${esc(x.reading)}</span> ${esc(x.meaning_ko)}`)}` : ''}
+    ${(r.grammar || []).length ? `<div class="sec">문법</div>${list(r.grammar, x => `${hl(x.pattern, 'p')} ${esc(x.meaning_ko)} <span class="meta">${esc(x.note)}</span>`)}` : ''}
+  </div>
+  <div class="bubble">
+    <div class="k">返事</div>
+    <div><span class="t jp" lang="ja">${esc(r.reply.text)}</span>${sp2(r.reply.text)}</div>
+    <div class="meta jp" style="font-size:12.5px">${esc(cleanReading(r.reply.reading))}</div>
+    <div class="meta" style="font-size:12.5px">${esc(r.reply.pronunciation_ko)}</div>
+    <div>${esc(r.reply.meaning_ko)}</div>
+  </div>`;
+}
+function drawHistory(){
+  $('#chatlog').innerHTML = store.hist.length ? store.hist.map(h => chatMe(h) + (h.full ? chatBot(h.full) : '')).join('')
+    : '<div class="meta">아래에 아무 말이나 써보세요.</div>';
+}
+$('#level').value = store.prefs.level; $('#style').value = store.prefs.style;
+const setPrefs = () => { store.prefs = { level:$('#level').value, style:$('#style').value, ts:Date.now() }; persist(); };
+$('#level').onchange = setPrefs; $('#style').onchange = setPrefs;
+$('#reset').onclick = () => { store.hist = []; store.resetAt = Date.now(); persist(); drawHistory(); };
+
+const cin = $('#cin');
+cin.addEventListener('input', () => { cin.style.height = 'auto'; cin.style.height = Math.min(cin.scrollHeight, 140) + 'px'; });
+async function sendChat(){
+  const text = cin.value.trim(); if (!text) return;
+  cin.value = ''; cin.style.height = 'auto';
+  $('#csend').disabled = true;
+  const log = $('#chatlog');
+  log.insertAdjacentHTML('beforeend', `<div class="bubble me">${esc(text)}</div><div class="loading" id="ld">생각 중…</div>`);
+  window.scrollTo(0, document.body.scrollHeight);
+  try {
+    const r = await api('/api/chat', {
+      text, level: $('#level').value, style: $('#style').value,
+      history: store.hist.map(h => ({ u: h.u, a: h.a })),
+    });
+    store.hist.push({ t: Date.now(), u: text, a: { corrected: r.corrected, reply: r.reply }, full: r });
+    store.hist = store.hist.slice(-30);
+    persist(); drawHistory();
+  } catch (err) {
+    $('#ld')?.remove();
+    log.insertAdjacentHTML('beforeend', `<div class="err">${esc(err.message)}</div>`);
+  }
+  $('#csend').disabled = false;
+  window.scrollTo(0, document.body.scrollHeight);
+}
+$('#csend').onclick = sendChat;
+
+/* ================= 상황별 회화 ================= */
+const SIT_STATIC = SITUATIONS_DATA.map(buildSituation);
+const SIT_AI = ['맛집 웨이팅','분실물·도난','관광지에서','미용실','렌터카','사진 부탁하기'];
+$('#chips').innerHTML =
+  SIT_STATIC.map(s => `<button type="button" data-sit="${esc(s.title)}">${esc(s.title)}</button>`).join('') +
+  SIT_AI.map(s => `<button type="button" data-sit="${esc(s)}">✨ ${esc(s)}</button>`).join('');
+$('#chips').onclick = e => { const b = e.target.closest('[data-sit]'); if (b) loadSituation(b.dataset.sit); };
+$('#sitform').onsubmit = e => { e.preventDefault(); const v = $('#sitq').value.trim(); if (v) loadSituation(v); };
+function findStaticSituation(name){
+  const q = nk(name);
+  return SIT_STATIC.find(s => nk(s.title) === q) || (q.length >= 2 ? SIT_STATIC.find(s => nk(s.title).includes(q)) : null);
+}
+async function loadSituation(name, force = false){
+  const level = $('#level').value, style = $('#style').value;
+  const box = $('#sitres');
+  document.querySelectorAll('#chips button').forEach(b => b.classList.toggle('on', b.dataset.sit === name));
+  const st = findStaticSituation(name);
+  if (st) { shown[cardId(st)] = st; box.innerHTML = cardHtml(st); return; }
+  const key = [name, level, style].join('|');
+  const cache = lsGet('sitcache', {});
+  let c = !force && cache[key];
+  if (!c) {
+    box.innerHTML = '<div class="loading">회화 표현 만드는 중…</div>';
+    try {
+      c = await api('/api/situation', { situation: name, level, style });
+      cache[key] = c;
+      const keys = Object.keys(cache); if (keys.length > 40) delete cache[keys[0]];
+      lsSet('sitcache', cache);
+    } catch (err) { box.innerHTML = `<div class="err">${esc(err.message)}</div>`; return; }
+  }
+  shown[cardId(c)] = c;
+  box.innerHTML = cardHtml(c) + `<button class="btn ghost block" id="sitre" type="button">같은 상황 다시 만들기</button>`;
+  $('#sitre').onclick = () => loadSituation(name, true);
+}
+
+/* ================= 가타카나 ================= */
+const KATA = [
+ ['ア','아','アイス','아이스크림'],['イ','이','インク','잉크'],['ウ','우','ウイスキー','위스키'],['エ','에','エレベーター','엘리베이터'],['オ','오','オレンジ','오렌지'],
+ ['カ','카','カメラ','카메라'],['キ','키','キムチ','김치'],['ク','쿠','クッキー','쿠키'],['ケ','케','ケーキ','케이크'],['コ','코','コーヒー','커피'],
+ ['サ','사','サラダ','샐러드'],['シ','시','シャツ','셔츠'],['ス','스','スマホ','스마트폰'],['セ','세','セーター','스웨터'],['ソ','소','ソファ','소파'],
+ ['タ','타','タクシー','택시'],['チ','치','チーズ','치즈'],['ツ','츠','ツアー','투어'],['テ','테','テレビ','텔레비전'],['ト','토','トイレ','화장실'],
+ ['ナ','나','ナイフ','나이프'],['ニ','니','ニュース','뉴스'],['ヌ','누','ヌードル','누들'],['ネ','네','ネクタイ','넥타이'],['ノ','노','ノート','노트'],
+ ['ハ','하','ハンバーガー','햄버거'],['ヒ','히','ヒーター','히터'],['フ','후','フォーク','포크'],['ヘ','헤','ヘルメット','헬멧'],['ホ','호','ホテル','호텔'],
+ ['マ','마','マスク','마스크'],['ミ','미','ミルク','우유'],['ム','무','ムービー','영화'],['メ','메','メニュー','메뉴'],['モ','모','モデル','모델'],
+ ['ヤ','야','ヤクルト','야쿠르트'],['ユ','유','ユニフォーム','유니폼'],['ヨ','요','ヨーグルト','요거트'],
+ ['ラ','라','ラーメン','라면'],['リ','리','リモコン','리모컨'],['ル','루','ルール','규칙'],['レ','레','レストラン','레스토랑'],['ロ','로','ロボット','로봇'],
+ ['ワ','와','ワイン','와인'],['ン','응','パン','빵']
+];
+const kgrid = $('#kgrid'), kbox = $('#kbox');
+kgrid.innerHTML = KATA.map((k, i) => `<button data-k="${i}">${k[0]}<small>${k[1]}</small></button>`).join('');
+kgrid.onclick = e => {
+  const b = e.target.closest('[data-k]'); if (!b) return;
+  const k = KATA[b.dataset.k];
+  speak(k[0]);
+  kbox.innerHTML = `<div class="card"><div class="k">片仮名</div>
+    <div class="big jp" lang="ja" style="font-size:48px">${k[0]}${sp(k[0])} <span class="meta"> ${k[1]}</span></div>
+    <div class="ex"><span class="t jp" lang="ja">${hl(k[2], 'y')}</span>${sp2(k[2])}<div class="m">${esc(k[3])}</div></div></div>`;
+};
+const CONFUSE = { 'シ':'츠','ツ':'시','ソ':'응','ン':'소','ノ':'메','メ':'노','ク':'케','ケ':'쿠','ワ':'우','ウ':'와','ヌ':'메','ス':'누' };
+$('#quizbtn').onclick = quiz;
+function quiz(){
+  const k = KATA[Math.floor(Math.random() * KATA.length)];
+  const opts = new Set([k[1]]);
+  if (CONFUSE[k[0]]) opts.add(CONFUSE[k[0]]);
+  while (opts.size < 4) opts.add(KATA[Math.floor(Math.random() * KATA.length)][1]);
+  const arr = [...opts].sort(() => Math.random() - .5);
+  kbox.innerHTML = `<div class="card"><div class="quizq jp" lang="ja">${k[0]}</div>
+    <div class="choices">${arr.map(o => `<button data-a="${o}">${o}</button>`).join('')}</div><div id="qfb"></div></div>`;
+  kbox.querySelector('.choices').onclick = e => {
+    const b = e.target.closest('[data-a]'); if (!b || b.disabled) return;
+    const ok = b.dataset.a === k[1];
+    kbox.querySelectorAll('.choices button').forEach(x => { x.disabled = true; if (x.dataset.a === k[1]) x.classList.add('ok'); });
+    if (!ok) b.classList.add('no');
+    speak(k[2]);
+    $('#qfb').innerHTML = `<div class="ex"><span class="t jp" lang="ja">${hl(k[2], 'y')}</span>${sp2(k[2])} <span class="meta">${esc(k[3])}</span>
+      <div><button class="btn block" id="nextq">다음 문제</button></div></div>`;
+    $('#nextq').onclick = quiz;
+  };
+}
+
+/* ================= 시작 ================= */
+drawHistory();
+syncNow();
+</script>
+</body>
+</html>
