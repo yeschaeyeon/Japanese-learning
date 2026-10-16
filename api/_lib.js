@@ -1,15 +1,6 @@
 // 공통 함수: 접근 코드 확인 + Gemini API 호출 + JSON 정리
 // 환경변수: GEMINI_API_KEY (필수), ACCESS_CODE (필수), GEMINI_MODEL (선택)
 
-function checkAccess(req, res) {
-  const code = (process.env.ACCESS_CODE || '').trim();
-  const given = String(req.headers['x-access-code'] || '').trim();
-  if (code && given !== code) {   // ACCESS_CODE를 안 넣으면 코드 없이 누구나 사용(개인용)
-    res.status(401).json({ error: 'unauthorized' });
-    return false;
-  }
-  return true;
-}
 
 function parseJson(text) {
   const cleaned = text.replace(/```json|```/g, '').trim();
@@ -64,4 +55,4 @@ async function callAI({ system, messages, max_tokens = 3000 }) {
   throw new Error(lastMsg);
 }
 
-module.exports = { checkAccess, callAI };
+module.exports = { callAI };
